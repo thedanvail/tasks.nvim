@@ -12,7 +12,7 @@ Use any Neovim plugin manager. With `lazy.nvim`, this spec lazy-loads on the
 commands or keymap:
 
 ```lua
-{
+return {
   "your-name/tasks.nvim",
   main = "tasks",
   cmd = { "TasksOpen", "TasksToggle", "TasksAdd" },
@@ -33,7 +33,7 @@ For local development:
 
 ```lua
 {
-  dir = "~/git/tasks.nvim",
+  dir = "<path to tasks.nvim>",
   name = "tasks.nvim",
   main = "tasks",
   cmd = { "TasksOpen", "TasksToggle", "TasksAdd" },
