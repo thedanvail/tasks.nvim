@@ -50,6 +50,21 @@ lazy.nvim can load the plugin when the key is pressed:
   }
 <
 
+Config-function style mappings:
+>
+  config = function()
+    local tasks = require("tasks")
+
+    tasks.setup()
+
+    vim.keymap.set("n", "<leader>tt", tasks.toggle, { desc = "Toggle repo tasks" })
+    vim.keymap.set("n", "<leader>to", tasks.open, { desc = "Open repo tasks" })
+    vim.keymap.set("n", "<leader>ta", function()
+      tasks.add()
+    end, { desc = "Add repo task" })
+  end
+<
+
 ==============================================================================
 COMMANDS                                             *tasks.nvim-commands*
 
@@ -91,8 +106,8 @@ Default configuration:
     keymap = nil,
     data_path = vim.fs.joinpath(vim.fn.stdpath("data"), "tasks.nvim", "tasks.json"),
     popup = {
-      width = 52,
-      height = 12,
+      width = 68,
+      height = 16,
       border = "rounded",
       title = "Tasks",
     },

@@ -147,6 +147,19 @@ tests[#tests + 1] = {
 
     assert_eq(true, tasks.open())
     assert_true(require("tasks.ui").is_open(), "expected floating task window")
+    local win = vim.api.nvim_get_current_win()
+    assert_eq(68, vim.api.nvim_win_get_width(win), "expected larger default popup width")
+    assert_eq(16, vim.api.nvim_win_get_height(win), "expected larger default popup height")
+
+    local buf = vim.api.nvim_win_get_buf(win)
+    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    assert_eq(16, #lines, "expected footer to be padded to the bottom")
+    assert_true(lines[#lines]:find("a:add", 1, true), "expected add key in footer")
+    assert_true(lines[#lines]:find("e:edit", 1, true), "expected edit key in footer")
+    assert_true(lines[#lines]:find("x:toggle", 1, true), "expected toggle key in footer")
+    assert_true(lines[#lines]:find("d:delete", 1, true), "expected delete key in footer")
+    assert_true(lines[#lines]:find("q:close", 1, true), "expected close key in footer")
+
     assert_eq(false, tasks.toggle())
     assert_eq(false, require("tasks.ui").is_open())
   end,

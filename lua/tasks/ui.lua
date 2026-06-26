@@ -49,9 +49,19 @@ local function ensure_highlights()
   local ok, comment = pcall(vim.api.nvim_get_hl, 0, { name = "Comment", link = false })
   if ok and comment and comment.fg then
     hl.fg = comment.fg
+    pcall(vim.api.nvim_set_hl, 0, "TasksFooter", { fg = comment.fg })
+  else
+    pcall(vim.api.nvim_set_hl, 0, "TasksFooter", {})
   end
 
   pcall(vim.api.nvim_set_hl, 0, "TasksDone", hl)
+
+  local special_ok, special = pcall(vim.api.nvim_get_hl, 0, { name = "Special", link = false })
+  if special_ok and special and special.fg then
+    pcall(vim.api.nvim_set_hl, 0, "TasksFooterKey", { fg = special.fg, bold = true })
+  else
+    pcall(vim.api.nvim_set_hl, 0, "TasksFooterKey", { bold = true })
+  end
 end
 
 local function as_keys(value)
@@ -94,6 +104,53 @@ local function set_modifiable(value)
   end
 end
 
+local function key_label(value)
+  local keys = as_keys(value)
+  local key = keys[1]
+  if not key then
+    return nil
+  end
+
+  local labels = {
+    ["<CR>"] = "Enter",
+    ["<Esc>"] = "Esc",
+    ["<Space>"] = "Space",
+  }
+
+  return labels[key] or key
+end
+
+local function footer_line()
+  local mappings = config.get().mappings
+  local entries = {
+    { key = key_label(mappings.add), label = "add" },
+    { key = key_label(mappings.edit), label = "edit" },
+    { key = key_label(mappings.toggle), label = "toggle" },
+    { key = key_label(mappings.delete), label = "delete" },
+    { key = key_label(mappings.close), label = "close" },
+  }
+
+  local line = " "
+  local spans = {}
+
+  for _, entry in ipairs(entries) do
+    if entry.key then
+      if line ~= " " then
+        line = line .. "  "
+      end
+
+      local start_col = #line
+      line = line .. entry.key .. ":" .. entry.label
+      table.insert(spans, {
+        start_col = start_col,
+        end_col = start_col + #entry.key,
+      })
+    end
+  end
+
+  return line, spans
+end
+
 local function render()
   if not valid_buf(state.buf) then
     return
@@ -102,6 +159,7 @@ local function render()
   ensure_highlights()
 
   local lines = {}
+  local footer, footer_spans = footer_line()
   if #state.tasks == 0 then
     table.insert(lines, "  No tasks")
   else
@@ -117,6 +175,16 @@ local function render()
     state.input.line = #lines
   end
 
+  local footer_index = #lines + 1
+  if valid_win(state.win) then
+    local height = vim.api.nvim_win_get_height(state.win)
+    while #lines < height - 1 do
+      table.insert(lines, "")
+    end
+    footer_index = #lines + 1
+  end
+  table.insert(lines, footer)
+
   set_modifiable(true)
   vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, lines)
   vim.api.nvim_buf_clear_namespace(state.buf, ns, 0, -1)
@@ -125,6 +193,11 @@ local function render()
     if task.done then
       vim.api.nvim_buf_add_highlight(state.buf, ns, "TasksDone", index - 1, 0, -1)
     end
+  end
+
+  vim.api.nvim_buf_add_highlight(state.buf, ns, "TasksFooter", footer_index - 1, 0, -1)
+  for _, span in ipairs(footer_spans) do
+    vim.api.nvim_buf_add_highlight(state.buf, ns, "TasksFooterKey", footer_index - 1, span.start_col, span.end_col)
   end
 
   set_modifiable(state.input ~= nil)
@@ -292,8 +365,8 @@ local function create_window(root)
   local popup = cfg.popup or {}
   local columns = vim.o.columns
   local lines = vim.o.lines
-  local width = dimension(popup.width, columns, 52, 24)
-  local height = dimension(popup.height, lines, 12, 5)
+  local width = dimension(popup.width, columns, 68, 24)
+  local height = dimension(popup.height, lines, 16, 5)
 
   local buf = vim.api.nvim_create_buf(false, true)
   vim.bo[buf].buftype = "nofile"

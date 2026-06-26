@@ -53,6 +53,22 @@ For local development:
 The plugin's own `keymap` option is still available, but with lazy.nvim the
 `keys` field is preferred because it can lazy-load the plugin.
 
+If you prefer a Harpoon-style config function with direct mappings:
+
+```lua
+config = function()
+  local tasks = require("tasks")
+
+  tasks.setup()
+
+  vim.keymap.set("n", "<leader>tt", tasks.toggle, { desc = "Toggle repo tasks" })
+  vim.keymap.set("n", "<leader>to", tasks.open, { desc = "Open repo tasks" })
+  vim.keymap.set("n", "<leader>ta", function()
+    tasks.add()
+  end, { desc = "Add repo task" })
+end
+```
+
 ## Usage
 
 Commands:
@@ -76,8 +92,8 @@ require("tasks").setup({
   keymap = nil,
   data_path = vim.fs.joinpath(vim.fn.stdpath("data"), "tasks.nvim", "tasks.json"),
   popup = {
-    width = 52,
-    height = 12,
+    width = 68,
+    height = 16,
     border = "rounded",
     title = "Tasks",
   },

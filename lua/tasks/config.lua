@@ -8,8 +8,8 @@ local defaults = {
   keymap = nil,
   data_path = nil,
   popup = {
-    width = 52,
-    height = 12,
+    width = 68,
+    height = 16,
     border = "rounded",
     title = "Tasks",
   },
@@ -51,4 +51,3 @@ function M.defaults()
 end
 
 return M
-
