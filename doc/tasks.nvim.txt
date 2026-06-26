@@ -1,0 +1,110 @@
+*tasks.nvim.txt*              Repository-local task popup
+
+==============================================================================
+CONTENTS                                                   *tasks.nvim-contents*
+
+1. Introduction                                      |tasks.nvim|
+2. Setup                                             |tasks.nvim-setup|
+3. lazy.nvim                                         |tasks.nvim-lazy|
+4. Commands                                          |tasks.nvim-commands|
+5. Lua API                                           |tasks.nvim-api|
+6. Configuration                                     |tasks.nvim-configuration|
+
+==============================================================================
+INTRODUCTION                                                *tasks.nvim*
+
+tasks.nvim provides a small floating task list for the current git repository.
+Task data is stored in Neovim's data directory by default, keyed by absolute git
+root, so repositories do not share task lists and repository working trees stay
+clean.
+
+==============================================================================
+SETUP                                                   *tasks.nvim-setup*
+
+>
+  require("tasks").setup()
+<
+
+The keymap is opt-in. Omitting `keymap` only registers commands and the Lua API.
+
+==============================================================================
+LAZY.NVIM                                             *tasks.nvim-lazy*
+
+With lazy.nvim, prefer the `keys` field over the plugin's `keymap` option so
+lazy.nvim can load the plugin when the key is pressed:
+>
+  {
+    "your-name/tasks.nvim",
+    main = "tasks",
+    cmd = { "TasksOpen", "TasksToggle", "TasksAdd" },
+    keys = {
+      {
+        "<leader>tt",
+        function()
+          require("tasks").toggle()
+        end,
+        desc = "Toggle repo tasks",
+      },
+    },
+    opts = {},
+  }
+<
+
+==============================================================================
+COMMANDS                                             *tasks.nvim-commands*
+
+                                                        *:TasksOpen*
+:TasksOpen
+        Open the task popup for the current git repository.
+
+                                                        *:TasksToggle*
+:TasksToggle
+        Toggle the task popup for the current git repository.
+
+                                                        *:TasksAdd*
+:TasksAdd [task text]
+        Add a task to the current git repository. Without text, opens the popup
+        and starts an add prompt.
+
+==============================================================================
+LUA API                                                    *tasks.nvim-api*
+
+require("tasks").setup({opts})                         *tasks.setup()*
+        Configure tasks.nvim.
+
+require("tasks").open()                                *tasks.open()*
+        Open the task popup.
+
+require("tasks").toggle()                              *tasks.toggle()*
+        Toggle the task popup.
+
+require("tasks").add({text})                           *tasks.add()*
+        Add a task. When text is omitted, opens the popup and starts an add
+        prompt.
+
+==============================================================================
+CONFIGURATION                                  *tasks.nvim-configuration*
+
+Default configuration:
+>
+  {
+    keymap = nil,
+    data_path = vim.fs.joinpath(vim.fn.stdpath("data"), "tasks.nvim", "tasks.json"),
+    popup = {
+      width = 52,
+      height = 12,
+      border = "rounded",
+      title = "Tasks",
+    },
+    mappings = {
+      close = { "q", "<Esc>" },
+      add = "a",
+      edit = "e",
+      toggle = { "x", "<Space>" },
+      delete = "d",
+    },
+  }
+<
+
+==============================================================================
+vim:tw=78:ts=8:noet:ft=help:norl:
