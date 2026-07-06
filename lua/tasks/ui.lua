@@ -392,7 +392,9 @@ local function create_window(root)
     title_pos = "center",
   })
 
-  vim.wo[win].wrap = false
+  vim.wo[win].wrap = true
+  vim.wo[win].linebreak = true
+  vim.wo[win].breakindent = true
   vim.wo[win].number = false
   vim.wo[win].relativenumber = false
   vim.wo[win].signcolumn = "no"

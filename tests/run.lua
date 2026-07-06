@@ -150,6 +150,8 @@ tests[#tests + 1] = {
     local win = vim.api.nvim_get_current_win()
     assert_eq(68, vim.api.nvim_win_get_width(win), "expected larger default popup width")
     assert_eq(16, vim.api.nvim_win_get_height(win), "expected larger default popup height")
+    assert_eq(true, vim.wo[win].wrap, "expected popup text wrapping to be enabled")
+    assert_eq(true, vim.wo[win].linebreak, "expected popup linebreak to be enabled")
 
     local buf = vim.api.nvim_win_get_buf(win)
     local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
